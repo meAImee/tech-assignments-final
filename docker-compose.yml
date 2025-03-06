@@ -1,0 +1,25 @@
+services:
+ db:
+   image: mysql:latest
+   restart: always
+   ports:
+     - '3307:3306'
+   env_file: .env
+   healthcheck:
+     test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+     interval: 5s
+     timeout: 5s
+     retries: 5
+     start_period: 30s
+
+
+ web:
+   build: .
+   ports:
+     - '8000:8000'
+   volumes:
+     - ./app:/code/app
+   depends_on:
+     db:
+       condition: service_healthy
+   env_file: .env
